@@ -71,7 +71,7 @@ public final class SNPBot {
                     continue;
                 log("Sending to " + chatId + ": " + event);
                 if (!first) {
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 }
                 first = false;
                 client.sendMessage(chatId, event.toHTML(), this::log);
