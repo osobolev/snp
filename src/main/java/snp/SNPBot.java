@@ -13,11 +13,13 @@ import java.util.stream.Stream;
 
 public final class SNPBot {
 
+    private final boolean debug;
     private final SNPLog log;
     private final TelegramClient client;
     private final Map<String, LocalDate> lastAlert = new HashMap<>();
 
-    private SNPBot(SNPLog log, TelegramClient client) {
+    private SNPBot(boolean debug, SNPLog log, TelegramClient client) {
+        this.debug = debug;
         this.log = log;
         this.client = client;
         log("=== SNP bot started");
@@ -70,11 +72,14 @@ public final class SNPBot {
                 if (alreadyPosted.contains(event.link))
                     continue;
                 log("Sending to " + chatId + ": " + event);
-                if (!first) {
-                    Thread.sleep(2000);
-                }
+                boolean wasFirst = first;
                 first = false;
-                client.sendMessage(chatId, event.toHTML(), this::log);
+                if (!debug) {
+                    if (!wasFirst) {
+                        Thread.sleep(2000);
+                    }
+                    client.sendMessage(chatId, event.toHTML(), this::log);
+                }
                 Files.write(chatDb, List.of(event.link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             }
         }
@@ -94,7 +99,7 @@ public final class SNPBot {
     public static void main(String[] args) throws IOException {
         SNPLog log = SNPLog.create(args.length > 0 ? args[0] : null);
         TelegramClient client = TelegramClient.create();
-        SNPBot bot = new SNPBot(log, client);
+        SNPBot bot = new SNPBot(args.length <= 0, log, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
             bot::botAction, 0, 30, TimeUnit.MINUTES
         );
