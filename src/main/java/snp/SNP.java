@@ -16,27 +16,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class SNP {
+final class SNP {
 
     private static final Pattern STAGE_PATTERN = Pattern.compile(
         "Сцена:\\s*(.*)",
         Pattern.UNICODE_CHARACTER_CLASS |  Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    private record Title(
-        String title,
-        String link
-    )
-    {}
+    private static final class Title {
 
-    private record Event(
-        String title,
-        String link,
-        List<String> details,
-        String stage,
-        String price
-    )
-    {}
+        final String title;
+        final String link;
+
+        Title(String title, String link) {
+            this.title = title;
+            this.link = link;
+        }
+    }
 
     private static String getStage(String text) {
         Matcher matcher = STAGE_PATTERN.matcher(text);
@@ -111,30 +107,22 @@ public final class SNP {
         return new Event(title.title, title.link, details, stage, price);
     }
 
-    private static List<Event> loadAllEvents() throws IOException, InterruptedException {
+    static List<Event> loadAllEvents() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest get = HttpRequest
+            .newBuilder(URI.create("https://prodaja.snp.org.rs/sr/site/index"))
+            .build();
+        HttpResponse<String> resp = client.send(get, HttpResponse.BodyHandlers.ofString());
+        String body = resp.body();
+        Document doc = Jsoup.parse(body);
+        Elements reps = doc.select("div.repertoireCnt");
         List<Event> events = new ArrayList<>();
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            HttpRequest get = HttpRequest
-                .newBuilder(URI.create("https://prodaja.snp.org.rs/sr/site/index"))
-                .build();
-            HttpResponse<String> resp = client.send(get, HttpResponse.BodyHandlers.ofString());
-            String body = resp.body();
-            Document doc = Jsoup.parse(body);
-            Elements reps = doc.select("div.repertoireCnt");
-            for (Element rep : reps) {
-                Event event = parseEvent(rep);
-                if (event != null) {
-                    events.add(event);
-                }
+        for (Element rep : reps) {
+            Event event = parseEvent(rep);
+            if (event != null) {
+                events.add(event);
             }
         }
         return events;
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        List<Event> events = loadAllEvents();
-        for (Event event : events) {
-            System.out.println(event);
-        }
     }
 }
