@@ -21,4 +21,6 @@ tasks.withType(JavaCompile::class).configureEach {
 
 dependencies {
     implementation("org.jsoup:jsoup:1.22.1")
+    implementation("io.github.osobolev:small-json:1.4")
+    implementation("org.owasp.encoder:encoder:1.4.0")
 }
