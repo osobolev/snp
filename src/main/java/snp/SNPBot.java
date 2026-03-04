@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 public final class SNPBot {
 
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+    private static final ZoneId CET = ZoneId.of("Europe/Belgrade");
 
     private final Path postedFile = Path.of("posted_links.txt");
     private final PrintWriter log;
@@ -30,7 +32,7 @@ public final class SNPBot {
     }
 
     private static String getTimestamp() {
-        return TIMESTAMP_FORMAT.format(LocalDateTime.now());
+        return TIMESTAMP_FORMAT.format(LocalDateTime.now(CET));
     }
 
     private void log(String level, String message) {
