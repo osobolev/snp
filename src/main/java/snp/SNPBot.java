@@ -58,9 +58,9 @@ public final class SNPBot {
         for (Event event : allEvents) {
             if (postedLinks.contains(event.link))
                 continue;
-            log("Sending " + event);
             String html = event.toHTML();
             for (String chatId : event.sendTo()) {
+                log("Sending to " + chatId + ": " + event);
                 if (!first) {
                     Thread.sleep(1000);
                 }
