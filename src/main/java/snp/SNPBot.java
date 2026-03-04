@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -14,7 +12,6 @@ import java.util.stream.Stream;
 
 public final class SNPBot {
 
-    private final Path postedFile = Path.of("posted_links.txt");
     private final SNPLog log;
     private final TelegramClient client;
 
@@ -53,21 +50,26 @@ public final class SNPBot {
             return;
         }
 
-        Set<String> postedLinks = loadLinks(postedFile);
+        Map<String, Set<String>> postedInChats = new HashMap<>();
         boolean first = true;
         for (Event event : allEvents) {
-            if (postedLinks.contains(event.link))
-                continue;
-            String html = event.toHTML();
             for (String chatId : event.sendTo()) {
+                Path chatDb = Path.of(chatId + ".txt");
+                Set<String> alreadyPosted = postedInChats.get(chatId);
+                if (alreadyPosted == null) {
+                    alreadyPosted = loadLinks(chatDb);
+                    postedInChats.put(chatId, alreadyPosted);
+                }
+                if (alreadyPosted.contains(event.link))
+                    continue;
                 log("Sending to " + chatId + ": " + event);
                 if (!first) {
                     Thread.sleep(1000);
                 }
                 first = false;
-                client.sendMessage(chatId, html, this::log);
+                client.sendMessage(chatId, event.toHTML(), this::log);
+                Files.write(chatDb, List.of(event.link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             }
-            Files.write(postedFile, List.of(event.link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
     }
 
