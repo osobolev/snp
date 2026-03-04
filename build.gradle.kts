@@ -24,3 +24,22 @@ dependencies {
     implementation("io.github.osobolev:small-json:1.4")
     implementation("org.owasp.encoder:encoder:1.4.0")
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Class-Path" to configurations.runtimeClasspath.map { conf -> conf.files.map { f -> f.name }.sorted().joinToString(" ") },
+            "Main-Class" to "snp.SNPBot"
+        )
+    }
+}
+
+tasks.clean {
+    delete("$rootDir/distr")
+}
+
+tasks.register("distr", Copy::class) {
+    from(configurations.runtimeClasspath)
+    from(tasks.jar)
+    into("$rootDir/distr")
+}

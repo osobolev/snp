@@ -1,0 +1,11 @@
+[Unit]
+Description=SNP bot
+
+[Service]
+User=arshin
+Group=arshin
+WorkingDirectory=/home/arshin/snp
+ExecStart=/usr/bin/java -jar snp-1.0.jar snp.log
+
+[Install]
+WantedBy=multi-user.target
