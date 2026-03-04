@@ -60,7 +60,6 @@ public final class SNPBot {
         }
 
         Map<String, Set<String>> postedInChats = new HashMap<>();
-        boolean first = true;
         for (Event event : allEvents) {
             for (String chatId : event.sendTo()) {
                 Path chatDb = Path.of(chatId + ".txt");
@@ -72,12 +71,7 @@ public final class SNPBot {
                 if (alreadyPosted.contains(event.link))
                     continue;
                 log("Sending to " + chatId + ": " + event);
-                boolean wasFirst = first;
-                first = false;
                 if (!debug) {
-                    if (!wasFirst) {
-                        Thread.sleep(2000);
-                    }
                     client.sendMessage(chatId, event.toHTML(), this::log);
                 }
                 Files.write(chatDb, List.of(event.link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);

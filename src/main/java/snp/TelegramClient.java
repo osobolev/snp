@@ -20,6 +20,8 @@ final class TelegramClient {
 
     private final String botToken;
 
+    private Long lastSend = null;
+
     TelegramClient(String botToken) {
         this.botToken = botToken;
     }
@@ -76,7 +78,7 @@ final class TelegramClient {
         return null;
     }
 
-    void sendMessage(String chatId, String html, Consumer<String> logger) throws IOException, InterruptedException {
+    private void doSendMessage(String chatId, String html, Consumer<String> logger) throws IOException, InterruptedException {
         int tries = 0;
         while (true) {
             tries++;
@@ -87,6 +89,21 @@ final class TelegramClient {
                 throw new IOException("Too many retries");
             logger.accept("Retry " + tries + " - waiting for " + retryAfter + " sec...");
             Thread.sleep(retryAfter.intValue() * 1000L);
+        }
+    }
+
+    void sendMessage(String chatId, String html, Consumer<String> logger) throws IOException, InterruptedException {
+        if (lastSend != null) {
+            long sinceLastSend = System.currentTimeMillis() - lastSend.longValue();
+            long toWait = 2000 - sinceLastSend;
+            if (toWait > 0) {
+                Thread.sleep(toWait);
+            }
+        }
+        try {
+            doSendMessage(chatId, html, logger);
+        } finally {
+            lastSend = System.currentTimeMillis();
         }
     }
 }
