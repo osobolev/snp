@@ -88,6 +88,7 @@ public final class SNPBot {
         } catch (Exception ex) {
             log("ERROR", ex.toString());
             ex.printStackTrace(log);
+            log.flush();
         }
     }
 
