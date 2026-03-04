@@ -36,34 +36,28 @@ public final class SNPBot {
         }
     }
 
-    private List<Event> loadNewEvents() throws IOException, InterruptedException {
-        List<Event> allEvents = SNP.loadAllEvents();
-        if (allEvents.isEmpty()) {
-            alert("No events found!");
-            return allEvents;
-        }
-
-        Set<String> postedLinks;
-        if (Files.exists(postedFile)) {
-            try (Stream<String> lines = Files.lines(postedFile)) {
-                postedLinks = lines.collect(Collectors.toSet());
+    private static Set<String> loadLinks(Path file) throws IOException {
+        if (Files.exists(file)) {
+            try (Stream<String> lines = Files.lines(file)) {
+                return lines.collect(Collectors.toSet());
             }
         } else {
-            postedLinks = Collections.emptySet();
+            return Collections.emptySet();
         }
-
-        return allEvents
-            .stream()
-            .filter(e -> !postedLinks.contains(e.link))
-            .collect(Collectors.toList());
     }
 
     private void postNewEvents() throws IOException, InterruptedException {
-        List<Event> newEvents = loadNewEvents();
-        if (newEvents.isEmpty())
+        List<Event> allEvents = SNP.loadAllEvents();
+        if (allEvents.isEmpty()) {
+            alert("No events found!");
             return;
+        }
+
+        Set<String> postedLinks = loadLinks(postedFile);
         boolean first = true;
-        for (Event event : newEvents) {
+        for (Event event : allEvents) {
+            if (postedLinks.contains(event.link))
+                continue;
             log("Sending " + event);
             String html = event.toHTML();
             for (String chatId : event.sendTo()) {
