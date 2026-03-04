@@ -25,7 +25,6 @@ final class Event {
     }
 
     List<String> sendTo() {
-        // todo: possibly use filter by stage
         return List.of("@SNP_sve");
     }
 
