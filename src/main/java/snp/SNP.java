@@ -111,6 +111,7 @@ final class SNP {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest get = HttpRequest
             .newBuilder(URI.create("https://prodaja.snp.org.rs/sr/site/index"))
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36")
             .build();
         HttpResponse<String> resp = client.send(get, HttpResponse.BodyHandlers.ofString());
         String body = resp.body();
