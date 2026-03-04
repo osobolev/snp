@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ public final class SNPBot {
 
     private final SNPLog log;
     private final TelegramClient client;
+    private final Map<String, LocalDate> lastAlert = new HashMap<>();
 
     private SNPBot(SNPLog log, TelegramClient client) {
         this.log = log;
@@ -25,9 +27,14 @@ public final class SNPBot {
         log.info(message);
     }
 
-    private void alert(String message) {
+    private void alert(String type, String message) {
+        LocalDate today = LocalDate.now();
+        LocalDate last = lastAlert.get(type);
+        if (last != null && !last.isBefore(today))
+            return;
         try {
             client.sendMessage("@SNP_alerts", Event.escape(message), this::log);
+            lastAlert.put(type, today);
         } catch (Exception ex) {
             log.error(ex);
         }
@@ -46,7 +53,7 @@ public final class SNPBot {
     private void postNewEvents() throws IOException, InterruptedException {
         List<Event> allEvents = SNP.loadAllEvents();
         if (allEvents.isEmpty()) {
-            alert("No events found!");
+            alert("empty", "No events found!");
             return;
         }
 
@@ -80,7 +87,7 @@ public final class SNPBot {
             log("Successfully finished SNP scan!");
         } catch (Exception ex) {
             log.error(ex);
-            alert("Error: " + ex);
+            alert("error", "Error: " + ex);
         }
     }
 
