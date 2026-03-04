@@ -1,7 +1,5 @@
 package snp;
 
-import org.owasp.encoder.Encode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +29,14 @@ final class Event {
         return List.of("@SNP_sve");
     }
 
-    static String escape(String text) {
-        return Encode.forHtmlContent(text);
-    }
-
     String toHTML() {
         List<String> lines = new ArrayList<>();
-        lines.add(String.format("<b><a href=\"%s\">%s</a></b>", link, escape(title)));
+        lines.add(String.format("<b><a href=\"%s\">%s</a></b>", link, EventBuilder.escape(title)));
         for (String detail : details) {
-            lines.add(escape(detail));
+            lines.add(EventBuilder.escape(detail));
         }
         if (price != null) {
-            lines.add(escape("Цена: " + price));
+            lines.add(EventBuilder.escape("Цена: " + price));
         }
         return String.join("\n", lines);
     }

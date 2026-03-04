@@ -13,15 +13,8 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final class SNP {
-
-    private static final Pattern STAGE_PATTERN = Pattern.compile(
-        "Сцена:\\s*(.*)",
-        Pattern.UNICODE_CHARACTER_CLASS |  Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
-    );
 
     private static final class Title {
 
@@ -32,13 +25,6 @@ final class SNP {
             this.title = title;
             this.link = link;
         }
-    }
-
-    private static String getStage(String text) {
-        Matcher matcher = STAGE_PATTERN.matcher(text);
-        if (!matcher.find())
-            return null;
-        return matcher.group(1);
     }
 
     private static boolean canBuy(Elements buttons) {
@@ -72,8 +58,7 @@ final class SNP {
 
     private static Event parseEvent(Element rep) {
         Title title = null;
-        List<String> details = new ArrayList<>();
-        String stage = null;
+        EventBuilder eb = new EventBuilder();
         String price = null;
         for (Element row : rep.select("div.row")) {
             if (row.hasClass("buttons")) {
@@ -91,20 +76,14 @@ final class SNP {
                     Iterator<String> lines = item.wholeText().lines().iterator();
                     while (lines.hasNext()) {
                         String line = lines.next().strip();
-                        if (!line.isEmpty()) {
-                            details.add(line);
-                            String maybeStage = getStage(line);
-                            if (maybeStage != null) {
-                                stage = maybeStage;
-                            }
-                        }
+                        eb.addLine(line);
                     }
                 }
             }
         }
         if (title == null)
             return null;
-        return new Event(title.title, title.link, details, stage, price);
+        return eb.build(title.title, title.link, price);
     }
 
     static List<Event> loadAllEvents() throws IOException, InterruptedException {

@@ -33,7 +33,7 @@ public final class SNPBot {
         if (last != null && !last.isBefore(today))
             return;
         try {
-            client.sendMessage("@SNP_alerts", Event.escape(message), this::log);
+            client.sendMessage("@SNP_alerts", EventBuilder.escape(message), this::log);
             lastAlert.put(type, today);
         } catch (Exception ex) {
             log.error(ex);
