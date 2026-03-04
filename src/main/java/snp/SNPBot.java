@@ -28,8 +28,20 @@ public final class SNPBot {
         log.info(message);
     }
 
+    private void alert(String message) {
+        try {
+            client.sendMessage("@SNP_alerts", Event.escape(message), this::log);
+        } catch (Exception ex) {
+            log.error(ex);
+        }
+    }
+
     private List<Event> loadNewEvents() throws IOException, InterruptedException {
         List<Event> allEvents = SNP.loadAllEvents();
+        if (allEvents.isEmpty()) {
+            alert("No events found!");
+            return allEvents;
+        }
 
         Set<String> postedLinks;
         if (Files.exists(postedFile)) {
@@ -72,6 +84,7 @@ public final class SNPBot {
             log("Successfully finished SNP scan!");
         } catch (Exception ex) {
             log.error(ex);
+            alert("Error: " + ex);
         }
     }
 

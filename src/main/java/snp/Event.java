@@ -31,7 +31,7 @@ final class Event {
         return List.of("@SNP_sve");
     }
 
-    private static String escape(String text) {
+    static String escape(String text) {
         return Encode.forHtmlContent(text);
     }
 
