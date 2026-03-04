@@ -16,7 +16,7 @@ final class Event {
 
     @Override
     public String toString() {
-        return title + " (" + link + ")";
+        return "\"" + title + "\" (" + link + ")";
     }
 
     List<String> sendTo() {
