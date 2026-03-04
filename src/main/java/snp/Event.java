@@ -1,22 +1,17 @@
 package snp;
 
-import java.util.ArrayList;
 import java.util.List;
 
 final class Event {
 
     private final String title;
     final String link;
-    private final List<String> details;
-    private final String stage;
-    private final String price;
+    private final String html;
 
-    Event(String title, String link, List<String> details, String stage, String price) {
+    Event(String title, String link, String html) {
         this.title = title;
         this.link = link;
-        this.details = details;
-        this.stage = stage;
-        this.price = price;
+        this.html = html;
     }
 
     @Override
@@ -29,14 +24,6 @@ final class Event {
     }
 
     String toHTML() {
-        List<String> lines = new ArrayList<>();
-        lines.add(String.format("<b><a href=\"%s\">%s</a></b>", link, EventBuilder.escape(title)));
-        for (String detail : details) {
-            lines.add(EventBuilder.escape(detail));
-        }
-        if (price != null) {
-            lines.add(EventBuilder.escape("Цена: " + price));
-        }
-        return String.join("\n", lines);
+        return html;
     }
 }
