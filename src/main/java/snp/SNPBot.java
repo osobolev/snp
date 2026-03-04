@@ -1,15 +1,9 @@
 package snp;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -20,30 +14,18 @@ import java.util.stream.Stream;
 
 public final class SNPBot {
 
-    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-    private static final ZoneId CET = ZoneId.of("Europe/Belgrade");
-
     private final Path postedFile = Path.of("posted_links.txt");
-    private final PrintWriter log;
+    private final SNPLog log;
     private final TelegramClient client;
 
-    private SNPBot(PrintWriter log, TelegramClient client) {
+    private SNPBot(SNPLog log, TelegramClient client) {
         this.log = log;
         this.client = client;
         log("=== SNP bot started");
     }
 
-    private static String getTimestamp() {
-        return TIMESTAMP_FORMAT.format(LocalDateTime.now(CET));
-    }
-
-    private void log(String level, String message) {
-        log.println("[" + level + "] " + getTimestamp() + " | " + message);
-        log.flush();
-    }
-
     private void log(String message) {
-        log("INFO", message);
+        log.info(message);
     }
 
     private List<Event> loadNewEvents() throws IOException, InterruptedException {
@@ -89,22 +71,12 @@ public final class SNPBot {
             postNewEvents();
             log("Successfully finished SNP scan!");
         } catch (Exception ex) {
-            log("ERROR", ex.toString());
-            ex.printStackTrace(log);
-            log.flush();
-        }
-    }
-
-    private static PrintWriter openLog(String[] args) throws IOException {
-        if (args.length > 0) {
-            return new PrintWriter(new FileOutputStream(args[0], true), true, StandardCharsets.UTF_8);
-        } else {
-            return new PrintWriter(System.out, true);
+            log.error(ex);
         }
     }
 
     public static void main(String[] args) throws IOException {
-        PrintWriter log = openLog(args);
+        SNPLog log = SNPLog.create(args.length > 0 ? args[0] : null);
         TelegramClient client = TelegramClient.create();
         SNPBot bot = new SNPBot(log, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
