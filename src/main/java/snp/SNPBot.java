@@ -25,9 +25,11 @@ public final class SNPBot {
 
     private final Path postedFile = Path.of("posted_links.txt");
     private final PrintWriter log;
+    private final TelegramClient client;
 
-    private SNPBot(PrintWriter log) {
+    private SNPBot(PrintWriter log, TelegramClient client) {
         this.log = log;
+        this.client = client;
         log("=== SNP bot started");
     }
 
@@ -66,7 +68,6 @@ public final class SNPBot {
         List<Event> newEvents = loadNewEvents();
         if (newEvents.isEmpty())
             return;
-        TelegramClient client = TelegramClient.create();
         boolean first = true;
         for (Event event : newEvents) {
             log("Sending " + event);
@@ -103,7 +104,9 @@ public final class SNPBot {
     }
 
     public static void main(String[] args) throws IOException {
-        SNPBot bot = new SNPBot(openLog(args));
+        PrintWriter log = openLog(args);
+        TelegramClient client = TelegramClient.create();
+        SNPBot bot = new SNPBot(log, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
             bot::botAction, 0, 30, TimeUnit.MINUTES
         );
