@@ -85,7 +85,7 @@ final class TelegramClient {
                 return;
             if (tries >= 3)
                 throw new IOException("Too many retries");
-            logger.accept("Retry " + tries + " - waiting for " + retryAfter + "...");
+            logger.accept("Retry " + tries + " - waiting for " + retryAfter + " sec...");
             Thread.sleep(retryAfter.intValue() * 1000L);
         }
     }
