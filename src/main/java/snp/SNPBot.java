@@ -1,15 +1,12 @@
 package snp;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class SNPBot {
 
@@ -42,16 +39,6 @@ public final class SNPBot {
         }
     }
 
-    private static Set<String> loadLinks(Path file) throws IOException {
-        if (Files.exists(file)) {
-            try (Stream<String> lines = Files.lines(file)) {
-                return lines.collect(Collectors.toSet());
-            }
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
     private void postNewEvents() throws IOException, InterruptedException {
         List<Event> allEvents = SNP.loadAllEvents();
         if (allEvents.isEmpty()) {
@@ -60,22 +47,17 @@ public final class SNPBot {
             return;
         }
 
-        Map<String, Set<String>> postedInChats = new HashMap<>();
+        Map<String, ChatDB> postedInChats = new HashMap<>();
         for (Event event : allEvents) {
             for (String chatId : event.sendTo()) {
-                Path chatDb = Path.of(chatId + ".txt");
-                Set<String> alreadyPosted = postedInChats.get(chatId);
-                if (alreadyPosted == null) {
-                    alreadyPosted = loadLinks(chatDb);
-                    postedInChats.put(chatId, alreadyPosted);
-                }
-                if (alreadyPosted.contains(event.link))
+                ChatDB alreadyPosted = postedInChats.computeIfAbsent(chatId, ChatDB::new);
+                if (alreadyPosted.containsLink(event.link))
                     continue;
                 log("Sending to " + chatId + ": " + event);
                 if (!debug) {
                     client.sendMessage(chatId, event.toHTML(), this::log);
                 }
-                Files.write(chatDb, List.of(event.link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                alreadyPosted.addLink(event.link);
             }
         }
     }
