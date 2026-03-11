@@ -40,7 +40,7 @@ final class EventBuilder {
         List<String> lines = new ArrayList<>();
         lines.add(String.format("<b><a href=\"%s\">%s</a></b>", link, escape(title)));
         lines.addAll(htmlLines);
-        if (price != null && !price.isEmpty()) {
+        if (!price.isEmpty()) {
             lines.add(escape("Цена: " + price));
         }
         String html = String.join("\n", lines);

@@ -59,7 +59,7 @@ final class SNP {
     private static Event parseEvent(Element rep) {
         Title title = null;
         EventBuilder eb = new EventBuilder();
-        String price = null;
+        String price = "";
         for (Element row : rep.select("div.row")) {
             if (row.hasClass("buttons")) {
                 Elements buttons = row.select("input[type=\"button\"]");
