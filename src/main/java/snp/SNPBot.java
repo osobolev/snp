@@ -55,6 +55,7 @@ public final class SNPBot {
     private void postNewEvents() throws IOException, InterruptedException {
         List<Event> allEvents = SNP.loadAllEvents();
         if (allEvents.isEmpty()) {
+            log.log("WARNING", "No events found!");
             alert("empty", "No events found!");
             return;
         }

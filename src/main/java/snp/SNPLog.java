@@ -33,7 +33,7 @@ final class SNPLog {
         return TIMESTAMP_FORMAT.format(LocalDateTime.now(CET));
     }
 
-    private void log(String level, String message) {
+    void log(String level, String message) {
         log.println("[" + level + "] " + getTimestamp() + " | " + message);
         log.flush();
     }
