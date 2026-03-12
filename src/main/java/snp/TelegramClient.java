@@ -38,7 +38,7 @@ final class TelegramClient {
     private Integer maybeSendMessage(String chatId, String html) throws IOException, InterruptedException {
         String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
 
-        JSONObject obj = new JSONObject();
+        JSONObject obj = JSON.newObject();
         obj.put("chat_id", chatId);
         obj.put("text", html);
         obj.put("parse_mode", "HTML");
@@ -69,7 +69,7 @@ final class TelegramClient {
                 } else {
                     retryAfter = null;
                 }
-                return retryAfter == null ? 1 : retryAfter.intValue();
+                return retryAfter == null ? 3 : retryAfter.intValue();
             }
             String description = error.opt("description", String.class);
             String message = description == null ? "HTTP error code: " + code : description;
