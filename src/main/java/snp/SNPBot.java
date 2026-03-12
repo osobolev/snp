@@ -13,7 +13,9 @@ public final class SNPBot {
     private final boolean debug;
     private final SNPLog log;
     private final TelegramClient client;
+
     private final Map<String, LocalDate> lastAlert = new HashMap<>();
+    private boolean wasEmpty = false;
 
     private SNPBot(boolean debug, SNPLog log, TelegramClient client) {
         this.debug = debug;
@@ -46,9 +48,15 @@ public final class SNPBot {
     private void postNewEvents() throws IOException, InterruptedException {
         List<Event> allEvents = SNP.loadAllEvents();
         if (allEvents.isEmpty()) {
+            wasEmpty = true;
             log.log("WARNING", "No events found!");
             alert("empty", "No events found!");
             return;
+        } else {
+            if (wasEmpty) {
+                alert(null, "Found events again!");
+            }
+            wasEmpty = false;
         }
 
         Map<String, ChatDB> postedInChats = new HashMap<>();
