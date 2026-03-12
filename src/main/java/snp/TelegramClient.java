@@ -19,20 +19,22 @@ import static smalljson.JSONFactory.JSON;
 final class TelegramClient {
 
     private final String botToken;
+    private final Consumer<String> logger;
 
     private Long lastSend = null;
 
-    TelegramClient(String botToken) {
+    TelegramClient(String botToken, Consumer<String> logger) {
         this.botToken = botToken;
+        this.logger = logger;
     }
 
-    static TelegramClient create() throws IOException {
+    static TelegramClient create(Consumer<String> logger) throws IOException {
         Properties properties = new Properties();
         try (BufferedReader rdr = Files.newBufferedReader(Path.of("telegram.properties"))) {
             properties.load(rdr);
         }
         String botToken = properties.getProperty("bot.token");
-        return new TelegramClient(botToken);
+        return new TelegramClient(botToken, logger);
     }
 
     private Integer maybeSendMessage(String chatId, String html) throws IOException, InterruptedException {
@@ -78,7 +80,7 @@ final class TelegramClient {
         return null;
     }
 
-    private void doSendMessage(String chatId, String html, Consumer<String> logger) throws IOException, InterruptedException {
+    private void doSendMessage(String chatId, String html) throws IOException, InterruptedException {
         int tries = 0;
         while (true) {
             tries++;
@@ -92,7 +94,7 @@ final class TelegramClient {
         }
     }
 
-    void sendMessage(String chatId, String html, Consumer<String> logger) throws IOException, InterruptedException {
+    void sendMessage(String chatId, String html) throws IOException, InterruptedException {
         if (lastSend != null) {
             long sinceLastSend = System.currentTimeMillis() - lastSend.longValue();
             long toWait = 2000 - sinceLastSend;
@@ -101,7 +103,7 @@ final class TelegramClient {
             }
         }
         try {
-            doSendMessage(chatId, html, logger);
+            doSendMessage(chatId, html);
         } finally {
             lastSend = System.currentTimeMillis();
         }

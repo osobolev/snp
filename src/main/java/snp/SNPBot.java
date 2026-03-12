@@ -31,7 +31,7 @@ public final class SNPBot {
 
     private boolean alert(String message) {
         try {
-            client.sendMessage("@SNP_alerts", EventBuilder.escape(message), this::log);
+            client.sendMessage("@SNP_alerts", EventBuilder.escape(message));
             return true;
         } catch (Exception ex) {
             log.error(ex);
@@ -71,7 +71,7 @@ public final class SNPBot {
                     continue;
                 log("Sending to " + chatId + ": " + event);
                 if (!debug) {
-                    client.sendMessage(chatId, event.toHTML(), this::log);
+                    client.sendMessage(chatId, event.toHTML());
                 }
                 alreadyPosted.addLink(event.link);
             }
@@ -96,7 +96,7 @@ public final class SNPBot {
 
     public static void main(String[] args) throws IOException {
         SNPLog log = SNPLog.create(args.length > 0 ? args[0] : null);
-        TelegramClient client = TelegramClient.create();
+        TelegramClient client = TelegramClient.create(log::info);
         SNPBot bot = new SNPBot(args.length <= 0, log, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
             bot::botAction, 0, 30, TimeUnit.MINUTES
