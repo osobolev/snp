@@ -16,6 +16,7 @@ public final class SNPBot {
 
     private final Map<String, LocalDate> lastAlert = new HashMap<>();
     private boolean wasEmpty = false;
+    private boolean wasError = false;
 
     private SNPBot(boolean debug, SNPLog log, TelegramClient client) {
         this.debug = debug;
@@ -81,8 +82,13 @@ public final class SNPBot {
         log("Starting SNP scan...");
         try {
             postNewEvents();
+            if (wasError) {
+                alert("No more errors!");
+            }
+            wasError = false;
             log("Successfully finished SNP scan!");
         } catch (Exception ex) {
+            wasError = true;
             log.error(ex);
             alert("error", "Error: " + ex);
         }
