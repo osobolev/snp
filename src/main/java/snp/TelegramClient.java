@@ -38,14 +38,13 @@ final class TelegramClient {
     }
 
     private Integer maybeSendMessage(String chatId, String html) throws IOException, InterruptedException {
-        String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
-
         JSONObject obj = JSON.newObject();
         obj.put("chat_id", chatId);
         obj.put("text", html);
         obj.put("parse_mode", "HTML");
         String json = JSONWriter.toString(obj);
 
+        String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
             .newBuilder()
