@@ -28,20 +28,23 @@ public final class SNPBot {
         log.info(message);
     }
 
-    private void alert(String type, String message) {
-        LocalDate today = LocalDate.now();
-        if (type != null) {
-            LocalDate last = lastAlert.get(type);
-            if (last != null && !last.isBefore(today))
-                return;
-        }
+    private boolean alert(String message) {
         try {
             client.sendMessage("@SNP_alerts", EventBuilder.escape(message), this::log);
-            if (type != null) {
-                lastAlert.put(type, today);
-            }
+            return true;
         } catch (Exception ex) {
             log.error(ex);
+            return false;
+        }
+    }
+
+    private void alert(String type, String message) {
+        LocalDate today = LocalDate.now();
+        LocalDate last = lastAlert.get(type);
+        if (last != null && !last.isBefore(today))
+            return;
+        if (alert(message)) {
+            lastAlert.put(type, today);
         }
     }
 
@@ -54,7 +57,7 @@ public final class SNPBot {
             return;
         } else {
             if (wasEmpty) {
-                alert(null, "Found events again!");
+                alert("Found events again!");
             }
             wasEmpty = false;
         }
