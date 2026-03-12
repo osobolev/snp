@@ -28,12 +28,16 @@ public final class SNPBot {
 
     private void alert(String type, String message) {
         LocalDate today = LocalDate.now();
-        LocalDate last = lastAlert.get(type);
-        if (last != null && !last.isBefore(today))
-            return;
+        if (type != null) {
+            LocalDate last = lastAlert.get(type);
+            if (last != null && !last.isBefore(today))
+                return;
+        }
         try {
             client.sendMessage("@SNP_alerts", EventBuilder.escape(message), this::log);
-            lastAlert.put(type, today);
+            if (type != null) {
+                lastAlert.put(type, today);
+            }
         } catch (Exception ex) {
             log.error(ex);
         }
