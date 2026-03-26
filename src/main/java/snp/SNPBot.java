@@ -1,6 +1,7 @@
 package snp;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -12,15 +13,17 @@ public final class SNPBot {
 
     private final boolean debug;
     private final SNPLog log;
+    private final HttpClient httpClient;
     private final TelegramClient client;
 
     private final Map<String, LocalDate> lastAlert = new HashMap<>();
     private boolean wasEmpty = false;
     private boolean wasError = false;
 
-    private SNPBot(boolean debug, SNPLog log, TelegramClient client) {
+    private SNPBot(boolean debug, SNPLog log, HttpClient httpClient, TelegramClient client) {
         this.debug = debug;
         this.log = log;
+        this.httpClient = httpClient;
         this.client = client;
         log("=== SNP bot started" + (debug ? " (debug mode)" : ""));
     }
@@ -50,7 +53,7 @@ public final class SNPBot {
     }
 
     private void postNewEvents() throws IOException, InterruptedException {
-        List<Event> allEvents = SNP.loadAllEvents();
+        List<Event> allEvents = SNP.loadAllEvents(httpClient);
         if (allEvents.isEmpty()) {
             wasEmpty = true;
             log.log("WARNING", "No events found!");
@@ -96,8 +99,9 @@ public final class SNPBot {
 
     public static void main(String[] args) throws IOException {
         SNPLog log = SNPLog.create(args.length > 0 ? args[0] : null);
-        TelegramClient client = TelegramClient.create(log::info);
-        SNPBot bot = new SNPBot(args.length <= 0, log, client);
+        HttpClient httpClient = HttpClient.newHttpClient();
+        TelegramClient client = TelegramClient.create(httpClient, log::info);
+        SNPBot bot = new SNPBot(args.length <= 0, log, httpClient, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
             bot::botAction, 0, 30, TimeUnit.MINUTES
         );

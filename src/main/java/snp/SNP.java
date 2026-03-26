@@ -86,8 +86,7 @@ final class SNP {
         return eb.build(title.title, title.link, price);
     }
 
-    static List<Event> loadAllEvents() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    static List<Event> loadAllEvents(HttpClient client) throws IOException, InterruptedException {
         HttpRequest get = HttpRequest
             .newBuilder(URI.create("https://prodaja.snp.org.rs/sr/site/index"))
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36")

@@ -18,23 +18,25 @@ import static smalljson.JSONFactory.JSON;
 
 final class TelegramClient {
 
+    private final HttpClient httpClient;
     private final String botToken;
     private final Consumer<String> logger;
 
     private Long lastSend = null;
 
-    TelegramClient(String botToken, Consumer<String> logger) {
+    private TelegramClient(HttpClient httpClient, String botToken, Consumer<String> logger) {
+        this.httpClient = httpClient;
         this.botToken = botToken;
         this.logger = logger;
     }
 
-    static TelegramClient create(Consumer<String> logger) throws IOException {
+    static TelegramClient create(HttpClient httpClient, Consumer<String> logger) throws IOException {
         Properties properties = new Properties();
         try (BufferedReader rdr = Files.newBufferedReader(Path.of("telegram.properties"))) {
             properties.load(rdr);
         }
         String botToken = properties.getProperty("bot.token");
-        return new TelegramClient(botToken, logger);
+        return new TelegramClient(httpClient, botToken, logger);
     }
 
     private Integer maybeSendMessage(String chatId, String html) throws IOException, InterruptedException {
@@ -45,7 +47,6 @@ final class TelegramClient {
         String json = JSONWriter.toString(obj);
 
         String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
             .newBuilder()
             .uri(URI.create(url))
@@ -53,7 +54,7 @@ final class TelegramClient {
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         int code = response.statusCode();
         if (code != 200) {
             JSONObject error;
