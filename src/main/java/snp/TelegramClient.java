@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -51,6 +52,7 @@ final class TelegramClient {
             .newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
+            .timeout(Duration.ofSeconds(120))
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
 
