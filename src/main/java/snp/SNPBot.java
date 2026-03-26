@@ -2,6 +2,7 @@ package snp;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +100,10 @@ public final class SNPBot {
 
     public static void main(String[] args) throws IOException {
         SNPLog log = SNPLog.create(args.length > 0 ? args[0] : null);
-        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpClient httpClient = HttpClient
+            .newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
         TelegramClient client = TelegramClient.create(httpClient, log::info);
         SNPBot bot = new SNPBot(args.length <= 0, log, httpClient, client);
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(
