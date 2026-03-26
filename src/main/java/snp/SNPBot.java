@@ -22,7 +22,7 @@ public final class SNPBot {
         this.debug = debug;
         this.log = log;
         this.client = client;
-        log("=== SNP bot started");
+        log("=== SNP bot started" + (debug ? " (debug mode)" : ""));
     }
 
     private void log(String message) {
