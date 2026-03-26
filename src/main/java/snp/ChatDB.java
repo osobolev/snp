@@ -12,16 +12,12 @@ import java.util.stream.Stream;
 
 final class ChatDB {
 
-    private final String chatId;
+    private final Path dbFile;
 
     private Set<String> alreadyPosted = null;
 
     ChatDB(String chatId) {
-        this.chatId = chatId;
-    }
-
-    private Path dbFile() {
-        return Path.of(chatId + ".txt");
+        this.dbFile = Path.of(chatId + ".txt");
     }
 
     private static Set<String> loadLinks(Path file) throws IOException {
@@ -36,12 +32,12 @@ final class ChatDB {
 
     boolean containsLink(String link) throws IOException {
         if (alreadyPosted == null) {
-            alreadyPosted = loadLinks(dbFile());
+            alreadyPosted = loadLinks(dbFile);
         }
         return alreadyPosted.contains(link);
     }
 
     void addLink(String link) throws IOException {
-        Files.write(dbFile(), List.of(link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        Files.write(dbFile, List.of(link), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 }
