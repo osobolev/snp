@@ -2,9 +2,9 @@
 Description=SNP bot
 
 [Service]
-User=arshin
-Group=arshin
-WorkingDirectory=/home/arshin/snp
+User=snp
+Group=snp
+WorkingDirectory=/home/snp/snp
 ExecStart=/usr/bin/java -jar snp-1.0.jar snp.log
 
 [Install]
