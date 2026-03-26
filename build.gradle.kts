@@ -11,13 +11,13 @@ repositories {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
 tasks.withType(JavaCompile::class).configureEach {
     options.encoding = "UTF-8"
-    options.release.set(11)
+    options.release.set(21)
 }
 
 dependencies {
