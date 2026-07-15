@@ -29,8 +29,12 @@ final class SNPLog {
         return new SNPLog(pw);
     }
 
+    static LocalDateTime now() {
+        return LocalDateTime.now(CET);
+    }
+
     private static String getTimestamp() {
-        return TIMESTAMP_FORMAT.format(LocalDateTime.now(CET));
+        return TIMESTAMP_FORMAT.format(now());
     }
 
     void log(String level, String message) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,11 @@ public final class SNPBot {
     }
 
     private void botAction() {
+        LocalDateTime now = SNPLog.now();
+        if (now.getHour() < 6) {
+            // Do nothing at 00:00 - 06:00
+            return;
+        }
         log("Starting SNP scan...");
         try {
             postNewEvents();
