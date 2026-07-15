@@ -6,11 +6,13 @@ final class Event {
 
     private final String title;
     final String link;
+    final boolean canBuy;
     private final String html;
 
-    Event(String title, String link, String html) {
+    Event(String title, String link, boolean canBuy, String html) {
         this.title = title;
         this.link = link;
+        this.canBuy = canBuy;
         this.html = html;
     }
 

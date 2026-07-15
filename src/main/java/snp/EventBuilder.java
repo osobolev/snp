@@ -36,7 +36,7 @@ final class EventBuilder {
         htmlLines.add(html);
     }
 
-    Event build(String title, String link, String price) {
+    Event build(String title, String link, String price, boolean canBuy) {
         List<String> lines = new ArrayList<>();
         lines.add(String.format("<b><a href=\"%s\">%s</a></b>", link, escape(title)));
         lines.addAll(htmlLines);
@@ -44,6 +44,6 @@ final class EventBuilder {
             lines.add(escape("Цена: " + price));
         }
         String html = String.join("\n", lines);
-        return new Event(title, link, html);
+        return new Event(title, link, canBuy, html);
     }
 }

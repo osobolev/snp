@@ -67,6 +67,11 @@ public final class SNPBot {
             }
             wasEmpty = false;
         }
+        allEvents.removeIf(e -> !e.canBuy);
+        if (allEvents.isEmpty()) {
+            log.log("WARNING", "No events to buy");
+            return;
+        }
 
         Map<String, ChatDB> postedInChats = new HashMap<>();
         for (Event event : allEvents) {

@@ -60,11 +60,13 @@ final class SNP {
         Title title = null;
         EventBuilder eb = new EventBuilder();
         String price = "";
+        boolean cannotBuy = false;
         for (Element row : rep.select("div.row")) {
             if (row.hasClass("buttons")) {
                 Elements buttons = row.select("input[type=\"button\"]");
-                if (!canBuy(buttons))
-                    return null;
+                if (!canBuy(buttons)) {
+                    cannotBuy = true;
+                }
                 Elements priceRange = row.select("span.price_range");
                 price = priceRange.text().strip();
             } else {
@@ -83,7 +85,7 @@ final class SNP {
         }
         if (title == null)
             return null;
-        return eb.build(title.title, title.link, price);
+        return eb.build(title.title, title.link, price, !cannotBuy);
     }
 
     static List<Event> loadAllEvents(HttpClient client) throws IOException, InterruptedException {
