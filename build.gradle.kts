@@ -14,11 +14,6 @@ java {
     }
 }
 
-tasks.withType(JavaCompile::class).configureEach {
-    options.encoding = "UTF-8"
-    options.release.set(21)
-}
-
 dependencies {
     implementation("org.jsoup:jsoup:1.23.2")
     implementation("io.github.osobolev:small-json:1.4")
