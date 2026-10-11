@@ -5,7 +5,7 @@ Description=SNP bot
 User=snp
 Group=snp
 WorkingDirectory=/home/snp/snp
-ExecStart=/usr/bin/java -jar snp-1.0.jar snp.log
+ExecStart=/usr/bin/java -jar snp.jar snp.log
 
 [Install]
 WantedBy=multi-user.target
